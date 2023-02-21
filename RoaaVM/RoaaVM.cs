@@ -180,6 +180,21 @@ using static JavaClass;
             Heap.Add(CurrentClass.NewObject());
         }
 
+        public void Run(params string[] arguments)
+        {
+            // Find main
+            if(CurrentClass.Methods.ContainsKey("Main"))
+            {
+                // Allocate arguments
+                Push(arguments);
+                InvokeStatic("Main");
+            }
+            else
+            {
+                Console.WriteLine("Can't find method Main(String[]), Terminating...");
+            }
+        }
+
         public bool InvokeStatic(string methodName)
         {
             int line = reader == null ? -1 : currLine;
@@ -243,7 +258,7 @@ using static JavaClass;
 
             while(PC < bytecode.Length)
             {
-                PC = (int)PC;
+                PC = Convert.ToInt32(PC);
                 Opcode op;
                 Debug.Write($"{PC}: {op = (Opcode)reader.ReadByte()}\t");
                 
@@ -309,14 +324,14 @@ using static JavaClass;
                     case Opcode.aload_3: Push(currFrame.LocalVariables[3]); break;
 
                     /*TODO: ARRAYS ELEMENTS LOADING OPCODES*/
-                    case Opcode.iaload: { int index = (int)Pop(); var arr = (object[])Pop(); Push(arr[index]); } break;
-                    case Opcode.laload: { int index = (int)Pop(); var arr = (object[])Pop(); Push(arr[index]); } break;
-                    case Opcode.faload: { int index = (int)Pop(); var arr = (object[])Pop(); Push(arr[index]); } break;
-                    case Opcode.daload: { int index = (int)Pop(); var arr = (object[])Pop(); Push(arr[index]); } break;
-                    case Opcode.aaload: { int index = (int)Pop(); var arr = (object[])Pop(); Push(arr[index]); } break;
-                    case Opcode.baload: { int index = (int)Pop(); var arr = (object[])Pop(); Push(arr[index]); } break;
-                    case Opcode.caload: { int index = (int)Pop(); var arr = (object[])Pop(); Push(arr[index]); } break;
-                    case Opcode.saload: { int index = (int)Pop(); var arr = (object[])Pop(); Push(arr[index]); } break;
+                    case Opcode.iaload: { int index = Convert.ToInt32(Pop()); var arr = (object[])Pop(); Push(arr[index]); } break;
+                    case Opcode.laload: { int index = Convert.ToInt32(Pop()); var arr = (object[])Pop(); Push(arr[index]); } break;
+                    case Opcode.faload: { int index = Convert.ToInt32(Pop()); var arr = (object[])Pop(); Push(arr[index]); } break;
+                    case Opcode.daload: { int index = Convert.ToInt32(Pop()); var arr = (object[])Pop(); Push(arr[index]); } break;
+                    case Opcode.aaload: { int index = Convert.ToInt32(Pop()); var arr = (object[])Pop(); Push(arr[index]); } break;
+                    case Opcode.baload: { int index = Convert.ToInt32(Pop()); var arr = (object[])Pop(); Push(arr[index]); } break;
+                    case Opcode.caload: { int index = Convert.ToInt32(Pop()); var arr = (object[])Pop(); Push(arr[index]); } break;
+                    case Opcode.saload: { int index = Convert.ToInt32(Pop()); var arr = (object[])Pop(); Push(arr[index]); } break;
                     #endregion
 
                     #region Stores
@@ -356,7 +371,7 @@ using static JavaClass;
                     /*TODO: Array elements storing opcodes*/
                     case Opcode.iastore: {
                             int value = Convert.ToInt32(Pop());
-                            int index = (int)Pop();
+                            int index = Convert.ToInt32(Pop());
                             object[] arr = (object[])Pop();
                             object oldVal = arr[index];
                             arr[index] = value;
@@ -381,72 +396,83 @@ using static JavaClass;
                     #endregion
 
                     #region Math
-                    case Opcode.iadd: { int val2    = (int)Pop();         int val1 = (int)Pop();      Push(val1 + val2); } break;
+                    case Opcode.iadd: { int val2    = Convert.ToInt32(Pop());         int val1 = Convert.ToInt32(Pop());      Push(val1 + val2); } break;
                     case Opcode.ladd: { long val2   = (long)Pop();       long val1 = (long)Pop();     Push(val1 + val2); } break;
                     case Opcode.fadd: { float val2  = (float)Pop();     float val1 = (float)Pop();    Push(val1 + val2); } break;
                     case Opcode.dadd: { double val2 = Convert.ToDouble(Pop());   double val1 = Convert.ToDouble(Pop());   Push(val1 + val2); } break;
 
-                    case Opcode.isub: { int val2    = (int)Pop();         int val1 = (int)Pop();      Push(val1 - val2); } break;
+                    case Opcode.isub: { int val2    = Convert.ToInt32(Pop());         int val1 = Convert.ToInt32(Pop());      Push(val1 - val2); } break;
                     case Opcode.lsub: { long val2   = (long)Pop();       long val1 = (long)Pop();     Push(val1 - val2); } break;
                     case Opcode.fsub: { float val2  = (float)Pop();     float val1 = (float)Pop();    Push(val1 - val2); } break;
                     case Opcode.dsub: { double val2 = Convert.ToDouble(Pop());   double val1 = Convert.ToDouble(Pop());   Push(val1 - val2); } break;
 
-                    case Opcode.imul: { int val2    = (int)Pop();         int val1 = (int)Pop();      Push(val1 * val2); } break;
+                    case Opcode.imul: { int val2    = Convert.ToInt32(Pop());         int val1 = Convert.ToInt32(Pop());      Push(val1 * val2); } break;
                     case Opcode.lmul: { long val2   = (long)Pop();       long val1 = (long)Pop();     Push(val1 * val2); } break;
                     case Opcode.fmul: { float val2  = (float)Pop();     float val1 = (float)Pop();    Push(val1 * val2); } break;
                     case Opcode.dmul: { double val2 = Convert.ToDouble(Pop());   double val1 = Convert.ToDouble(Pop());   Push(val1 * val2); } break;
 
-                    case Opcode.idiv: { int val2    = (int)Pop();         int val1 = (int)Pop();      Push(val1 / val2); } break;
+                    case Opcode.idiv: { int val2    = Convert.ToInt32(Pop());         int val1 = Convert.ToInt32(Pop());      Push(val1 / val2); } break;
                     case Opcode.ldiv: { long val2   = (long)Pop();       long val1 = (long)Pop();     Push(val1 / val2); } break;
                     case Opcode.fdiv: { float val2  = (float)Pop();     float val1 = (float)Pop();    Push(val1 / val2); } break;
                     case Opcode.ddiv: { double val2 = Convert.ToDouble(Pop());   double val1 = Convert.ToDouble(Pop());   Push(val1 / val2); } break;
 
-                    case Opcode.irem: { int val2    = (int)Pop();         int val1 = (int)Pop();      Push(val1 % val2); } break;
+                    case Opcode.irem: { int val2    = Convert.ToInt32(Pop());         int val1 = Convert.ToInt32(Pop());      Push(val1 % val2); } break;
                     case Opcode.lrem: { long val2   = (long)Pop();       long val1 = (long)Pop();     Push(val1 % val2); } break;
                     case Opcode.frem: { float val2  = (float)Pop();     float val1 = (float)Pop();    Push(val1 % val2); } break;
                     case Opcode.drem: { double val2 = Convert.ToDouble(Pop());   double val1 = Convert.ToDouble(Pop());   Push(val1 % val2); } break;
 
 
-                    case Opcode.ineg: Push(-(int)Pop());      break;
+                    case Opcode.ineg: Push(-Convert.ToInt32(Pop()));      break;
                     case Opcode.lneg: Push(-(long)Pop());     break;
                     case Opcode.fneg: Push(-(float)Pop());    break;
                     case Opcode.dneg: Push(-Convert.ToDouble(Pop()));   break;
 
-                    case Opcode.ishl: { int val2    = (int)Pop();         int val1 = (int)Pop();      Push(val1 << val2); } break;
+                    case Opcode.ishl: { int val2    = Convert.ToInt32(Pop());         int val1 = Convert.ToInt32(Pop());      Push(val1 << val2); } break;
                     //case Opcode.lshl: { long val2   = (long)Pop();       long val1 = (long)Pop();     Push(val1 << val2); } break;
                                                                                                                                                        
-                    case Opcode.ishr: { int val2    = (int)Pop();         int val1 = (int)Pop();      Push(val1 >> val2); } break;
+                    case Opcode.ishr: { int val2    = Convert.ToInt32(Pop());         int val1 = Convert.ToInt32(Pop());      Push(val1 >> val2); } break;
                     //case Opcode.lshr: { long val2   = (long)Pop();       long val1 = (long)Pop();     Push(val1 >> val2); } break;
 
-                    case Opcode.iand: { int val2 = (int)Pop(); int val1 = (int)Pop(); Push(val1 & val2); } break;
-                    case Opcode.land: { int val2 = (int)Pop(); int val1 = (int)Pop(); Push(val1 & val2); } break;
-                    case Opcode.ior: { int val2 = (int)Pop();  int val1 = (int)Pop(); Push(val1 | val2); } break;
-                    case Opcode.lor: { int val2 = (int)Pop();  int val1 = (int)Pop(); Push(val1 | val2); } break;
-                    case Opcode.ixor: { int val2 = (int)Pop();  int val1 = (int)Pop(); Push(val1 ^ val2); } break;
+                    case Opcode.iand: { int val2 = Convert.ToInt32(Pop()); int val1 = Convert.ToInt32(Pop()); Push(val1 & val2); } break;
+                    case Opcode.land: { int val2 = Convert.ToInt32(Pop()); int val1 = Convert.ToInt32(Pop()); Push(val1 & val2); } break;
+                    case Opcode.ior: { int val2 = Convert.ToInt32(Pop());  int val1 = Convert.ToInt32(Pop()); Push(val1 | val2); } break;
+                    case Opcode.lor: { int val2 = Convert.ToInt32(Pop());  int val1 = Convert.ToInt32(Pop()); Push(val1 | val2); } break;
+                    case Opcode.ixor: { int val2 = Convert.ToInt32(Pop());  int val1 = Convert.ToInt32(Pop()); Push(val1 ^ val2); } break;
                     case Opcode.iinc: { 
                             int index = reader.ReadByte();  
-                            currFrame.LocalVariables[index] = (int)currFrame.LocalVariables[index] + reader.ReadByte(); 
+                            currFrame.LocalVariables[index] = Convert.ToInt32(currFrame.LocalVariables[index]) + reader.ReadByte(); 
                         } break;
 
                     #endregion
 
                     #region Conversions
-                    case Opcode.i2l: Push((long)Pop()); break;
-                    case Opcode.i2f: Push((float)Pop()); break;
-                    case Opcode.i2d: Push(Convert.ToDouble(Pop())); break;
 
-                    case Opcode.l2i: Push((int)Pop()); break;
-                    case Opcode.l2f: Push((float)Pop()); break;
-                    case Opcode.l2d: Push(Convert.ToDouble(Pop())); break;
+                    case Opcode.l2i:
+                    case Opcode.f2i:
+                    case Opcode.d2i:
+                        Push(Convert.ToInt32(Pop()));
+                        break;
 
-                    case Opcode.f2i: Push((int)Pop()); break;
-                    case Opcode.f2l: Push((long)Pop()); break;
-                    case Opcode.f2d: Push(Convert.ToDouble(Pop())); break;
+                    case Opcode.i2l:
+                    case Opcode.f2l:
+                    case Opcode.d2l:
+                        Push(Convert.ToInt64(Pop()));
+                        break;
 
-                    case Opcode.d2i: Push((int)Pop()); break;
-                    case Opcode.d2l: Push((long)Pop()); break;
-                    case Opcode.d2f: Push((float)Pop()); break;
-                    /*i2c, i2s*/
+                    case Opcode.i2f:
+                    case Opcode.l2f:
+                    case Opcode.d2f:
+                        Push(Convert.ToSingle(Pop()));
+                        break;
+
+                    case Opcode.i2d:
+                    case Opcode.l2d:
+                    case Opcode.f2d:
+                        Push(Convert.ToDouble(Pop()));
+                        break;
+                    case Opcode.i2b: Push(Convert.ToByte(Pop())); break;
+                    case Opcode.i2c: Push(Convert.ToChar(Pop())); break;
+                    case Opcode.i2s: Push(Convert.ToInt16(Pop())); break;
                     #endregion
 
                     #region Comparisons 
@@ -462,12 +488,12 @@ using static JavaClass;
                         { double val2 = Convert.ToDouble(Pop()); double val1 = Convert.ToDouble(Pop()); Push(val1.CompareTo(val2)); }
                         break;
 
-                    case Opcode.ifeq: { int offset = reader.ReadInt16(); int val = (int)Pop(); if (val == 0) offsetPC(offset - 3); } break;
-                    case Opcode.ifne: { int offset = reader.ReadInt16(); int val = (int)Pop(); if (val != 0) offsetPC(offset - 3); } break;
-                    case Opcode.iflt: { int offset = reader.ReadInt16(); int val = (int)Pop(); if (val < 0)  offsetPC(offset - 3); } break;
-                    case Opcode.ifge: { int offset = reader.ReadInt16(); int val = (int)Pop(); if (val <= 0) offsetPC(offset - 3); } break;
-                    case Opcode.ifgt: { int offset = reader.ReadInt16(); int val = (int)Pop(); if (val > 0)  offsetPC(offset - 3); } break;
-                    case Opcode.ifle: { int offset = reader.ReadInt16(); int val = (int)Pop(); if (val >= 0) offsetPC(offset - 3); } break;
+                    case Opcode.ifeq: { int offset = reader.ReadInt16(); int val = Convert.ToInt32(Pop()); if (val == 0) offsetPC(offset - 3); } break;
+                    case Opcode.ifne: { int offset = reader.ReadInt16(); int val = Convert.ToInt32(Pop()); if (val != 0) offsetPC(offset - 3); } break;
+                    case Opcode.iflt: { int offset = reader.ReadInt16(); int val = Convert.ToInt32(Pop()); if (val < 0)  offsetPC(offset - 3); } break;
+                    case Opcode.ifge: { int offset = reader.ReadInt16(); int val = Convert.ToInt32(Pop()); if (val <= 0) offsetPC(offset - 3); } break;
+                    case Opcode.ifgt: { int offset = reader.ReadInt16(); int val = Convert.ToInt32(Pop()); if (val > 0)  offsetPC(offset - 3); } break;
+                    case Opcode.ifle: { int offset = reader.ReadInt16(); int val = Convert.ToInt32(Pop()); if (val >= 0) offsetPC(offset - 3); } break;
 
                     case Opcode.if_icmpeq: { int offset = reader.ReadInt16(); int val2 = Convert.ToInt32(Pop()); int val1 = Convert.ToInt32(Pop()); if (val1 == val2) offsetPC(offset - 3); } break;
                     case Opcode.if_icmpne: { int offset = reader.ReadInt16(); int val2 = Convert.ToInt32(Pop()); int val1 = Convert.ToInt32(Pop()); if (val1 != val2) offsetPC(offset - 3); } break;
@@ -489,6 +515,13 @@ using static JavaClass;
                             object old_val = obj[fieldRef.NameAndType.Name];
                             tracer.SetField(currLine, Heap.IndexOf(obj), fieldRef.NameAndType.Name, old_val?.ToString(), val.ToString());
                             obj[fieldRef.NameAndType.Name] = val;
+                        }
+                        break;
+                    case Opcode.getfield:
+                        {
+                            var field_ref = (FieldRefernceConstant)Constants[reader.ReadInt16()];
+                            Object obj = (Object)Pop();
+                            Push(obj[field_ref.NameAndType.Name]);
                         }
                         break;
                     case Opcode.invokevirtual:
@@ -528,7 +561,7 @@ using static JavaClass;
                         break;
                     case Opcode.newarray:
                         {
-                            int array_len = (int)Pop();
+                            int array_len = Convert.ToInt32(Pop());
                             int array_type = reader.ReadByte();
                             var arr = new object[array_len];
 
@@ -544,8 +577,10 @@ using static JavaClass;
                         offsetPC(reader.ReadInt16() - 3);
                         break;
                     case Opcode.ireturn:
+                    case Opcode.dreturn:
+                    case Opcode.lreturn:
                         {
-                            int retVal = (int)Pop();
+                            object retVal = Pop();
                             tracer.Return(currLine, retVal);
 
                             Console.WriteLine($"RET>> {retVal}");

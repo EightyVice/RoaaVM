@@ -20,7 +20,7 @@ JavaClass javaClass = JavaClass.FromFile("TestClass.class");
 JSONTraceWriter tracer = new JSONTraceWriter();
 RoaaVM VM = new RoaaVM(javaClass, tracer);
 
-VM.InvokeStatic("main");
+VM.Run();
 
 Console.WriteLine("=== TRACE OUTPUT ===");
 Console.WriteLine(tracer);
